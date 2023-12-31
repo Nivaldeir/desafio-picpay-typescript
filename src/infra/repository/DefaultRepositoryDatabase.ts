@@ -1,18 +1,32 @@
-import { DefaultRepository, QueryParams } from "../../aplication/repository/DefaultRepository";
+import { PrismaClientKnownRequestError, PrismaClientUnknownRequestError } from "@prisma/client/runtime/library";
+import { BaseRepository, QueryParams } from "../../aplication/repository/BaseRepository";
 
-export class DefaultRepositoryDatabase<T> implements DefaultRepository<T> {
-  constructor(private readonly client: any) { }
-  list(query?: QueryParams | undefined): Promise<T[]> {
-    throw new Error("Method not implemented.");
+type ParamsGeneric = {
+  get: Function
+  id: string
+}
+export class DefaultRepositoryDatabase<T extends ParamsGeneric> implements BaseRepository<T> {
+  constructor(private readonly database: any) { }
+  async list(query?: QueryParams | undefined): Promise<T[]> {
+    return await this.database.findMany(query)
   }
   async save(data: T): Promise<any> {
-    console.log(data)
-    return await this.client.create({
+    try {
+      return await this.database.create({
+        data: data.get(),
+      })
+    } catch (error: any) {
+      if (error instanceof PrismaClientKnownRequestError) {
+        console.log(error.message)
+        throw new Error(`${error?.meta?.modelName} with the ${error?.meta?.target} field is already registered`)
+      }
+    }
+  }
+  async update(data: T): Promise<any> {
+    return await this.database.update({
+      where: { id: data.id },
       data: data,
     })
-  }
-  update(data: T): Promise<any> {
-    throw new Error("Method not implemented.");
   }
   delete(id: string): Promise<any> {
     throw new Error("Method not implemented.");
