@@ -1,10 +1,19 @@
-version: "3"
+version: "3.7"
 services:
   postgres:
-    image: postgres:latest
+    image: postgres
     environment:
+      POSTGRES_DB: postgres
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: postgres
-      POSTGRES_DB: postgres
     ports:
-      - "5432:5432"
+      - 5432:5432
+  app:
+    container_name: backend
+    build: .
+    environment:
+      DATABASE_URL: "postgresql://postgres:postgres@postgres:5432/postgres"
+    ports:
+      - "3000:3000"
+    depends_on:
+      - postgres
