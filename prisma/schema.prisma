@@ -8,7 +8,29 @@ datasource db {
 }
 
 model User {
-  id       String @id @default(uuid())
-  name     String
-  lastName String
+  id                   String        @id @default(uuid())
+  firstName            String
+  lastName             String
+  document             String        @unique
+  email                String        @unique
+  password             String
+  balance              Float
+  usertype             UserType
+  sentTransactions     Transaction[] @relation("sentTransactions")
+  receivedTransactions Transaction[] @relation("receivedTransactions")
+}
+
+model Transaction {
+  id         String   @id @default(uuid())
+  amount     Decimal
+  senderId   String
+  receiverId String
+  timestamp  DateTime @default(now())
+  sender     User     @relation("sentTransactions", fields: [senderId], references: [id])
+  receiver   User     @relation("receivedTransactions", fields: [receiverId], references: [id])
+}
+
+enum UserType {
+  COMMON
+  MERCHANT
 }
