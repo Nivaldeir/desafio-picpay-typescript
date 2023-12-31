@@ -17,15 +17,15 @@ export class ExpressAdapter implements HttpServer {
   }
   on(method: string, url: string, callback: Function): void {
     this.app[method](url, async function (req: Request, res: Response) {
-      // try {
+      try {
         const output = await callback(req.params, req.body)
         res.json(output)
-      // } catch (e: any) {
-        // res.status(425).send({
-        //   error: true,
-        //   message: e.message
-        // })
-      // }
+      } catch (e: any) {
+        res.status(425).send({
+          error: true,
+          message: e.message
+        })
+      }
     })
   }
   listen(port: number, host: string): void {
