@@ -2,7 +2,7 @@ name: sheriff
 on:
   push:
     branches:
-      - master
+      - main
 jobs:
   sherrif:
     runs-on: ubuntu-latest
@@ -15,6 +15,6 @@ jobs:
           chahe-dependecy-path: ./packege-lock.json
       - name: install deps
         run: npm install
-        
+
       - name: run tests
         run: npm test
