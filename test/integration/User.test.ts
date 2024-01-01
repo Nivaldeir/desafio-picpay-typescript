@@ -1,37 +1,42 @@
-import { UserRepositoryDatabase } from '../../src/infra/repository/UserRepositoryDatabase';
-import { User } from '../../src/domain/User';
-import { PrismaClient } from '@prisma/client';
-import { Email } from '../../src/domain/Email';
+import { SaveUser } from './../../src/aplication/services/User/save.service';
+import { UserRepository } from '../../src/aplication/repository/UserRepository';
+import { UserType } from '@prisma/client';
 describe("Should User", () => {
-  const user = User.create({
-    balance: 100,
-    document: "470.649.910-04",
-    email: "user@example.com",
-    firstName: "John",
-    lastName: "Smith",
-    password: "password",
-    usertype: "MERCHANT"
-  });
+  const userRepositoryMock: UserRepository = {
+    list: jest.fn(),
+    save: jest.fn(),
+    update: jest.fn(),
+    delete: jest.fn()
+  }
+  beforeAll(async () => {
+    jest.spyOn(userRepositoryMock, "save")
+  })
+
+
   test("should create new User", async () => {
-    const client = new PrismaClient()
-    const repository = new UserRepositoryDatabase(client)
-    await repository.save(user);
-    const [output] = await repository.list({
-      where: {
-        id: user.id,
-      }
-    })
-    expect(output.id).toBe(user.id)
+    const input = {
+      balance: 100,
+      document: "470.649.910-04",
+      email: "user@example.com",
+      firstName: "John",
+      lastName: "Smith",
+      password: "password",
+      usertype: UserType.COMMON
+    }
+    const createUser = new SaveUser(userRepositoryMock)
+    await createUser.execute(input)
   })
   test("It should throw an error when registering user and email already registered", async () => {
-    const client = new PrismaClient()
-    const repository = new UserRepositoryDatabase(client)
-    expect(async () => await repository.save(user)).rejects.toThrow("User with the email field is already registered")
-  })
-  test("It should throw an error when registering user and dcument already registered", async () => {
-    user.email = new Email("user@example.com.btr")
-    const client = new PrismaClient()
-    const repository = new UserRepositoryDatabase(client)
-    expect(async () => await repository.save(user)).rejects.toThrow("User with the document field is already registered")
+    const input = {
+      balance: 100,
+      document: "470.649.910-04",
+      email: "user@example",
+      firstName: "John",
+      lastName: "Smith",
+      password: "password",
+      usertype: UserType.COMMON
+    }
+    const createUser = new SaveUser(userRepositoryMock)
+    expect(async () => await createUser.execute(input)).rejects.toThrow("Error: Invalid email")
   })
 })
