@@ -2,7 +2,7 @@ name: sheriff
 on:
   push:
     branches:
-      - main
+      - origin/main
 jobs:
   sherrif:
     runs-on: ubuntu-latest
