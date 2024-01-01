@@ -5,8 +5,12 @@ import { UserRepository } from "../../repository/UserRepository";
 export class SaveUser {
   constructor(private readonly userService: UserRepository) { }
   async execute(user: Input): Promise<void> {
-    const newUser = User.create(user)
-    return this.userService.save(newUser)
+    try {
+      const newUser = User.create(user)
+      await this.userService.save(newUser)
+    } catch (error: any) {
+      throw new Error(error)
+    }
   }
 }
 
