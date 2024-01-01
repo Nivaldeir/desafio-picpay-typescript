@@ -1,20 +1,24 @@
 name: sheriff
+
 on:
   push:
     branches:
-      - origin/main
+      - main  # Troque 'origin/main' para apenas 'main'
+
 jobs:
-  sherrif:
+  sheriff:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
-      - uses: actions/setup-node@v2
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v2
         with:
           node-version: 18
-          cache: npm
-          chahe-dependecy-path: ./packege-lock.json
-      - name: install deps
+
+      - name: Install dependencies
         run: npm install
 
-      - name: run tests
+      - name: Run tests
         run: npm test
