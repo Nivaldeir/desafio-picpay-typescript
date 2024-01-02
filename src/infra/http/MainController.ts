@@ -1,5 +1,4 @@
 import { ServicesFactory } from "../../aplication/factory/ServicesFactory";
-import { User } from "../../domain/User";
 import { HttpServer } from "./httpServer";
 export class MainController {
   constructor(private readonly route: HttpServer, private readonly repositoryService: ServicesFactory) {
@@ -12,8 +11,7 @@ export class MainController {
       if (missingFileds.length > 0) {
         throw new Error(`Missing required fields: ${missingFileds.join(', ')}`);
       }
-      const newUser = User.create({ ...body });
-      return await this.repositoryService.User().save.execute(newUser)
+      return await this.repositoryService.User().save.execute(body)
     })
 
     this.route.on("get", "/users", async (__: any, _: any, query: any) => {
